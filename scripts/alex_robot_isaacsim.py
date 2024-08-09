@@ -20,11 +20,26 @@ app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
 import omni.isaac.core.utils.prims as prim_utils
-
 import omni.isaac.lab.sim as sim_utils
+
 from omni.isaac.lab.assets import Articulation
 from omni.isaac.lab.assets.articulation import ArticulationCfg
 from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
+
+# ALEX_ROBOT_CFG = ArticulationCfg(
+#     spawn=sim_utils.UsdFileCfg(
+#         usd_path=f"/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/Models/Alex_TestStand_FixedHead/Alex_TestStand_FixedHead.usd",
+#         activate_contact_sensors=False,
+#         rigid_props=sim_utils.RigidBodyPropertiesCfg(
+#             disable_gravity=False,
+#             max_depenetration_velocity=5.0,
+#         ),
+#         articulation_props=sim_utils.ArticulationRootPropertiesCfg(
+#             enabled_self_collisions=True, solver_position_iteration_count=8, solver_velocity_iteration_count=0
+#         ),
+#         # collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
+#     )
+# )
 
 def design_scene():
 
@@ -41,20 +56,15 @@ def design_scene():
     # cfg_light_distant.func("/World/lightDistant", cfg_light_distant, translation=(0, 0, 10))
 
     # spawn dome light
-    cfg_light_dome = sim_utils.DomeLightCfg(
-        intensity=1500.0,
-        color=(1.0, 1.0, 1.0),
-    )
-
-    cfg_light_dome.func("/World/lightDome", cfg_light_dome, translation=(0, 0, 10))
-
+    cfg = sim_utils.DomeLightCfg(intensity=1500.0, color=(0.75, 0.75, 0.75))
+    cfg.func("/World/Light", cfg)
 
     # Origin 1 with alex robot
     prim_utils.create_prim("/World/Origin", "Xform", translation=(0.0, 0.0, 0.0))
 
     # spawn a usd file of a table into the scene
     cfg_stand = sim_utils.UsdFileCfg(usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/Stand/stand_instanceable.usd", scale=(2.0, 2.0, 2.0))
-    cfg_stand.func("/World/Origin/Table", cfg_stand, translation=(0, 0.0, 1.03))
+    cfg_stand.func("/World/Origin/Stand", cfg_stand, translation=(0, 0.0, 1.03))
 
     # spawn a usd file of a robot into the scene
     # cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/ANYbotics/anymal_d.usd", scale=(1.0, 1.0, 1.0))
@@ -68,16 +78,13 @@ def design_scene():
 
     cfg_robot.func("/World/Origin/Robot", cfg_robot, translation=(0.0, 0.0, 1.03))
 
-    # alex_robot_cfg = ALEX_ROBOT_CFG.replace(prim_path="/World/Origin/Robot")
-    # alex_robot = Articulation(cfg=alex_robot_cfg)
-
     cfg_cuboid_deformable = sim_utils.MeshCuboidCfg(
         size=(0.3, 0.7, 0.3),
         deformable_props=sim_utils.DeformableBodyPropertiesCfg(),
         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 0.0, 1.0)),
         physics_material=sim_utils.DeformableBodyMaterialCfg(),
     )
-    # cfg_cuboid_deformable.func("/World/Objects/CuboidDeformable", cfg_cuboid_deformable, translation=(0.0, 0.0, 2.25))
+    cfg_cuboid_deformable.func("/World/Objects/CuboidDeformable", cfg_cuboid_deformable, translation=(0.0, 0.0, 2.25))
 
 def main():
 
