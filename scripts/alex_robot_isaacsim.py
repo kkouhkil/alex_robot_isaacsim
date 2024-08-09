@@ -60,13 +60,11 @@ def design_scene():
     # cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/ANYbotics/anymal_d.usd", scale=(1.0, 1.0, 1.0))
     # cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/KINOVA/kinova_gen3_7_dof.usd", scale=(1.0, 1.0, 1.0))
 
-    # cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/MODELS/b1.usd", scale=(1.0, 1.0, 1.0))
-
     # cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/ALEX/alex_fixed_base_gripper_hands_no_collision_original_urdf.usd", scale=(1.0, 1.0, 1.0))
 
-    # cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/ALEX/alex_fixed_base_gripper_hands_with_collision_modified_urdf.usd", scale=(1.0, 1.0, 1.0))
-    # cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/ALEX/alex_fixed_base_psyonic_hands_with_collision_modified_urdf.usd", scale=(1.0, 1.0, 1.0))
-    cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/ALEX/alex_fixed_base_nub_hands_with_collision_modified_urdf.usd", scale=(1.0, 1.0, 1.0))
+    cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/Models/Alex_TestStand_FixedHead/Alex_TestStand_FixedHead.usd", scale=(1.0, 1.0, 1.0))
+    # cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/Models/Alex_TestStand_FixedHead_nubHands/Alex_TestStand_FixedHead_nubHands.usd", scale=(1.0, 1.0, 1.0))
+    # cfg_robot = sim_utils.UsdFileCfg(usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/Models/Alex_TestStand_FixedHead_psyonicHands/Alex_TestStand_FixedHead_psyonicHands.usd", scale=(1.0, 1.0, 1.0))
 
     cfg_robot.func("/World/Origin/Robot", cfg_robot, translation=(0.0, 0.0, 1.03))
 
@@ -74,7 +72,7 @@ def design_scene():
     # alex_robot = Articulation(cfg=alex_robot_cfg)
 
     cfg_cuboid_deformable = sim_utils.MeshCuboidCfg(
-        size=(0.2, 0.5, 0.2),
+        size=(0.3, 0.7, 0.3),
         deformable_props=sim_utils.DeformableBodyPropertiesCfg(),
         visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 0.0, 1.0)),
         physics_material=sim_utils.DeformableBodyMaterialCfg(),
@@ -88,7 +86,7 @@ def main():
     sim = sim_utils.SimulationContext(sim_cfg)
 
     # Set main camera
-    sim.set_camera_view([3.5, 0.0, 3.5], [-30 * math.pi/180, 0 * math.pi/180, 0 * math.pi/180])
+    sim.set_camera_view([3.5, 0.0, 2.5], [-180 * math.pi/180, 0 * math.pi/180, 0 * math.pi/180])
 
     # Design scene by adding assets to it
     design_scene()
