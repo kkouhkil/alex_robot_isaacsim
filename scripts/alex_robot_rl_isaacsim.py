@@ -1,0 +1,314 @@
+# Copyright (c) 2022-2024, The Isaac Lab Project Developers.
+# All rights reserved.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+
+"""
+This script demonstrates different single-arm manipulators.
+
+.. code-block:: bash
+
+    # Usage
+    ./isaaclab.sh -p source/standalone/demos/arms.py
+
+"""
+
+"""Launch Isaac Sim Simulator first."""
+
+import argparse
+
+from omni.isaac.lab.app import AppLauncher
+
+# add argparse arguments
+parser = argparse.ArgumentParser(description="This script demonstrates different single-arm manipulators.")
+# append AppLauncher cli args
+AppLauncher.add_app_launcher_args(parser)
+# parse the arguments
+args_cli = parser.parse_args()
+
+# launch omniverse app
+app_launcher = AppLauncher(args_cli)
+simulation_app = app_launcher.app
+
+"""Rest everything follows."""
+
+import numpy as np
+import torch
+import math
+
+import omni.isaac.core.utils.prims as prim_utils
+
+import omni.isaac.lab.sim as sim_utils
+from omni.isaac.lab.assets import Articulation
+from omni.isaac.lab.assets.articulation import ArticulationCfg
+from omni.isaac.lab.actuators import ImplicitActuatorCfg
+from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR
+
+ALEX_ROBOT_CFG = ArticulationCfg(
+    spawn=sim_utils.UsdFileCfg(
+        usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/Models/Alex_TestStand_FixedHead_psyonicHands/Alex_TestStand_FixedHead_psyonicHands.usd",
+        activate_contact_sensors=False,
+        rigid_props=sim_utils.RigidBodyPropertiesCfg(
+            disable_gravity=False,
+            max_depenetration_velocity=5.0,
+        ),
+        articulation_props=sim_utils.ArticulationRootPropertiesCfg(
+            enabled_self_collisions=True, solver_position_iteration_count=8, solver_velocity_iteration_count=0, fix_root_link=True
+        ),
+        # collision_props=sim_utils.CollisionPropertiesCfg(contact_offset=0.005, rest_offset=0.0),
+    ),
+    init_state=ArticulationCfg.InitialStateCfg(
+        joint_pos={
+            'LeftShoulderPitch': 0.048357511455654374,
+            'LeftShoulderRoll': 0.4872313475856689,
+            'LeftShoulderYaw': -0.05178980486407529,
+            'LeftElbowPitch': -1.6959062862442926,
+            'LeftWristYaw': 0.48159430270696807,
+            'LeftWristRoll': -1.4978222113624438,
+            'LeftGripperYaw': 1.6203515292517257,
+            'RightShoulderPitch': 0.04873066307647937,
+            'RightShoulderRoll': -0.4826395065886908,
+            'RightShoulderYaw': 0.04678311712508363,
+            'RightElbowPitch': -1.6965444788383939,
+            'RightWristYaw': -0.47744752865575935,
+            'RightWristRoll': 1.5025787437622276,
+            'RightGripperYaw': -1.6233965682966376,
+        },
+    ),
+    actuators={
+        "LeftShoulderPitch": ImplicitActuatorCfg(
+            joint_names_expr=["LeftShoulderPitch"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "LeftShoulderRoll": ImplicitActuatorCfg(
+            joint_names_expr=["LeftShoulderRoll"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "LeftShoulderYaw": ImplicitActuatorCfg(
+            joint_names_expr=["LeftShoulderYaw"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "LeftElbowPitch": ImplicitActuatorCfg(
+            joint_names_expr=["LeftElbowPitch"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "LeftWristYaw": ImplicitActuatorCfg(
+            joint_names_expr=["LeftWristYaw"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "LeftWristRoll": ImplicitActuatorCfg(
+            joint_names_expr=["LeftWristRoll"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "LeftGripperYaw": ImplicitActuatorCfg(
+            joint_names_expr=["LeftGripperYaw"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        
+        "RightShoulderPitch": ImplicitActuatorCfg(
+            joint_names_expr=["RightShoulderPitch"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "RightShoulderRoll": ImplicitActuatorCfg(
+            joint_names_expr=["RightShoulderRoll"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "RightShoulderYaw": ImplicitActuatorCfg(
+            joint_names_expr=["RightShoulderYaw"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "RightElbowPitch": ImplicitActuatorCfg(
+            joint_names_expr=["RightElbowPitch"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "RightWristYaw": ImplicitActuatorCfg(
+            joint_names_expr=["RightWristYaw"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "RightWristRoll": ImplicitActuatorCfg(
+            joint_names_expr=["RightWristRoll"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+        "RightGripperYaw": ImplicitActuatorCfg(
+            joint_names_expr=["RightGripperYaw"],
+            effort_limit=87.0,
+            velocity_limit=2.175,
+            stiffness=80.0,
+            damping=4.0,
+        ),
+    
+    },
+    soft_joint_pos_limit_factor=1.0,
+)
+
+##
+# Pre-defined configs
+##
+# isort: off
+from omni.isaac.lab_assets import (
+    FRANKA_PANDA_CFG,
+    UR10_CFG,
+    KINOVA_JACO2_N7S300_CFG,
+    KINOVA_JACO2_N6S300_CFG,
+    KINOVA_GEN3_N7_CFG,
+    SAWYER_CFG,
+)
+
+# isort: on
+
+
+def define_origins(num_origins: int, spacing: float) -> list[list[float]]:
+    """Defines the origins of the the scene."""
+    # create tensor based on number of environments
+    env_origins = torch.zeros(num_origins, 3)
+    # create a grid of origins
+    num_rows = np.floor(np.sqrt(num_origins))
+    num_cols = np.ceil(num_origins / num_rows)
+    xx, yy = torch.meshgrid(torch.arange(num_rows), torch.arange(num_cols), indexing="xy")
+    env_origins[:, 0] = spacing * xx.flatten()[:num_origins] - spacing * (num_rows - 1) / 2
+    env_origins[:, 1] = spacing * yy.flatten()[:num_origins] - spacing * (num_cols - 1) / 2
+    env_origins[:, 2] = 0.0
+    # return the origins
+    return env_origins.tolist()
+
+
+def design_scene() -> tuple[dict, list[list[float]]]:
+    """Designs the scene."""
+    # Ground-plane
+    cfg = sim_utils.GroundPlaneCfg()
+    cfg.func("/World/defaultGroundPlane", cfg)
+    # Lights
+    cfg = sim_utils.DomeLightCfg(intensity=2000.0, color=(0.75, 0.75, 0.75))
+    cfg.func("/World/Light", cfg)
+
+    # Create separate groups called "Origin1", "Origin2", "Origin3"
+    # Each group will have a mount and a robot on top of it
+    origins = define_origins(num_origins=1, spacing=2.0)
+
+    # Origin 1 with Alex
+    prim_utils.create_prim("/World/Origin", "Xform", translation=origins[0])
+    # -- Table
+    cfg = sim_utils.UsdFileCfg(
+        usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/Stand/stand_instanceable.usd", scale=(2.0, 2.0, 2.0)
+    )
+    cfg.func("/World/Origin/Table", cfg, translation=(0.0, 0.0, 1.03))
+    # -- Robot
+    alex_robot_cfg = ALEX_ROBOT_CFG.replace(prim_path="/World/Origin/Robot")
+    alex_robot_cfg.init_state.pos = (0.0, 0.0, 1.03)
+    alex = Articulation(cfg=alex_robot_cfg)
+
+    # return the scene information
+    scene_entities = {
+        "alex": alex
+    }
+    return scene_entities, origins
+
+
+def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articulation], origins: torch.Tensor):
+    """Runs the simulation loop."""
+    # Define simulation stepping
+    sim_dt = sim.get_physics_dt()
+    sim_time = 0.0
+    count = 0
+    # Simulate physics
+    while simulation_app.is_running():
+        # reset
+        if count % 200 == 0:
+            # reset counters
+            sim_time = 0.0
+            count = 0
+            # reset the scene entities
+            for index, robot in enumerate(entities.values()):
+                # root state
+                root_state = robot.data.default_root_state.clone()
+                root_state[:, :3] += origins[index]
+                robot.write_root_state_to_sim(root_state)
+                # set joint positions
+                joint_pos, joint_vel = robot.data.default_joint_pos.clone(), robot.data.default_joint_vel.clone()
+                robot.write_joint_state_to_sim(joint_pos, joint_vel)
+                # clear internal buffers
+                robot.reset()
+            print("[INFO]: Resetting robots state...")
+        # apply random actions to the robots
+        for robot in entities.values():
+            # generate random joint positions
+            joint_pos_target = robot.data.default_joint_pos + torch.randn_like(robot.data.joint_pos) * 0.1
+            joint_pos_target = joint_pos_target.clamp_(
+                robot.data.soft_joint_pos_limits[..., 0], robot.data.soft_joint_pos_limits[..., 1]
+            )
+            # apply action to the robot
+            robot.set_joint_position_target(joint_pos_target)
+            # write data to sim
+            robot.write_data_to_sim()
+        # perform step
+        sim.step()
+        # update sim-time
+        sim_time += sim_dt
+        count += 1
+        # update buffers
+        for robot in entities.values():
+            robot.update(sim_dt)
+
+
+def main():
+    """Main function."""
+    # Initialize the simulation context
+    sim_cfg = sim_utils.SimulationCfg()
+    sim = sim_utils.SimulationContext(sim_cfg)
+    # Set main camera
+    sim.set_camera_view([3.5, 0.0, 2.5], [-180 * math.pi/180, 0 * math.pi/180, 0 * math.pi/180])
+    # design scene
+    scene_entities, scene_origins = design_scene()
+    scene_origins = torch.tensor(scene_origins, device=sim.device)
+    # Play the simulator
+    sim.reset()
+    # Now we are ready!
+    print("[INFO]: Setup complete...")
+    # Run the simulator
+    run_simulator(sim, scene_entities, scene_origins)
+
+
+if __name__ == "__main__":
+    # run the main function
+    main()
+    # close sim app
+    simulation_app.close()
