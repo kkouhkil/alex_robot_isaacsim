@@ -204,6 +204,22 @@ def design_scene(num_of_origins) -> tuple[dict, list[list[float]]]:
         )
         cfg.func(f"/World/Origin_{i}/Stand_{i}", cfg, translation=(0.0, 0.0, 1.59))
 
+        cfg_cuboid_deformable = sim_utils.MeshCuboidCfg(
+        size=(0.2, 0.2, 0.2),
+        deformable_props=sim_utils.DeformableBodyPropertiesCfg(),
+        visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.0, 0.0, 1.0)),
+        physics_material=sim_utils.DeformableBodyMaterialCfg(),
+        )
+        cfg_cuboid_deformable.func(f"/World/Origin_{i}/CuboidDeformable{0}", cfg_cuboid_deformable, translation=(0.3, -0.4, 1.75))    
+
+        cfg_cuboid_deformable = sim_utils.MeshCuboidCfg(
+            size=(0.2, 0.2, 0.2),
+            deformable_props=sim_utils.DeformableBodyPropertiesCfg(),
+            visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.0, 0.0)),
+            physics_material=sim_utils.DeformableBodyMaterialCfg(),
+        )
+        cfg_cuboid_deformable.func(f"/World/Origin_{i}/CuboidDeformable{1}", cfg_cuboid_deformable, translation=(0.3, 0.4, 1.75))   
+
     alex_robot_cfg_dic = {}
     alex_dict = {}
 
@@ -289,7 +305,7 @@ def main():
     sim.set_camera_view([3.5, 0.0, 2.5], [-180 * math.pi/180, 0 * math.pi/180, 0 * math.pi/180])
 
     # number of loaded robots
-    num_of_origins = 9
+    num_of_origins = 1
 
     # design scene
     scene_entities, scene_origins = design_scene(num_of_origins)
