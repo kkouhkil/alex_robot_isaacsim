@@ -191,7 +191,6 @@ def design_scene(num_of_origins) -> tuple[dict, list[list[float]]]:
     cfg.func("/World/Light", cfg)
 
     # Each group will have a mount and a robot on top of it
-    # num_of_origins = 1
     origins = define_origins(num_origins = num_of_origins, spacing=2.0)
     
     for i in range(0, num_of_origins):
@@ -200,16 +199,17 @@ def design_scene(num_of_origins) -> tuple[dict, list[list[float]]]:
 
         # -- Stand
         cfg = sim_utils.UsdFileCfg(
-            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/Stand/stand_instanceable.usd", scale=(2.0, 2.0, 2.0)
+            # usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/Stand/stand_instanceable.usd", scale=(2.0, 2.0, 2.0)
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/ThorlabsTable/table_instanceable.usd", scale=(2.0, 2.0, 2.0)
         )
-        cfg.func(f"/World/Origin_{i}/Stand_{i}", cfg, translation=(0.0, 0.0, 1.03))
+        cfg.func(f"/World/Origin_{i}/Stand_{i}", cfg, translation=(0.0, 0.0, 1.59))
 
     alex_robot_cfg_dic = {}
     alex_dict = {}
 
     for i in range(0, num_of_origins):
         alex_robot_cfg_dic[f'alex_robot_cfg_{i}'] = ALEX_ROBOT_CFG.replace(prim_path=f"/World/Origin_{i}/Robot_{i}")
-        alex_robot_cfg_dic[f'alex_robot_cfg_{i}'].init_state.pos = (0, 0, 1.03)
+        alex_robot_cfg_dic[f'alex_robot_cfg_{i}'].init_state.pos = (0, 0, 1.59)
         alex_dict[f'alex_{i}'] = Articulation(cfg=alex_robot_cfg_dic[f'alex_robot_cfg_{i}'])
 
     # return the scene information
@@ -279,7 +279,6 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
         for robot in entities.values():
             robot.update(sim_dt)
 
-
 def main():
 
     # Initialize the simulation context
@@ -290,7 +289,7 @@ def main():
     sim.set_camera_view([3.5, 0.0, 2.5], [-180 * math.pi/180, 0 * math.pi/180, 0 * math.pi/180])
 
     # number of loaded robots
-    num_of_origins = 16
+    num_of_origins = 9
 
     # design scene
     scene_entities, scene_origins = design_scene(num_of_origins)
