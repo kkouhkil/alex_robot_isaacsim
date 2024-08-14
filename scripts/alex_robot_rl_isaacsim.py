@@ -13,8 +13,6 @@ args_cli = parser.parse_args()
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
-"""Rest everything follows."""
-
 import numpy as np
 import torch
 import math
@@ -29,7 +27,7 @@ from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR
 
 ALEX_ROBOT_CFG = ArticulationCfg(
     spawn=sim_utils.UsdFileCfg(
-        usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/Models/Alex_TestStand_FixedHead_psyonicHands/Alex_TestStand_FixedHead_psyonicHands.usd",
+        usd_path="/home/keyhan/Documents/IsaacLab/source/extensions/omni.isaac.lab_assets/data/Robots/Models/Alex_TestStand_FixedHead_nubHands/Alex_TestStand_FixedHead_nubHands.usd",
         activate_contact_sensors=False,
         rigid_props=sim_utils.RigidBodyPropertiesCfg(
             disable_gravity=False,
@@ -194,27 +192,38 @@ def design_scene() -> tuple[dict, list[list[float]]]:
 
     # Create separate groups called "Origin1", "Origin2", "Origin3"
     # Each group will have a mount and a robot on top of it
-    origins = define_origins(num_origins=1, spacing=2.0)
+    origins = define_origins(num_origins=9, spacing=2.0)
+    tmp_num_origins = 9
 
-    # Origin with Alex
-    prim_utils.create_prim("/World/Origin", "Xform", translation=origins[0])
+    for i in range(0, tmp_num_origins):
+        # Origin with Alex
+        prim_utils.create_prim(f"/World/Origin{i}", "Xform", translation=origins[i])
 
-    # -- Stand
-    cfg = sim_utils.UsdFileCfg(
-        usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/Stand/stand_instanceable.usd", scale=(2.0, 2.0, 2.0)
-    )
-    cfg.func("/World/Origin/Stand", cfg, translation=(0.0, 0.0, 1.03))
+        # -- Stand
+        cfg = sim_utils.UsdFileCfg(
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/Stand/stand_instanceable.usd", scale=(2.0, 2.0, 2.0)
+        )
+        cfg.func(f"/World/Origin{i}/Stand", cfg, translation=(0.0, 0.0, 1.03))
 
-    # -- Robot
-    alex_robot_cfg = ALEX_ROBOT_CFG.replace(prim_path="/World/Origin/Robot")
-    alex_robot_cfg.init_state.pos = (0.0, 0.0, 1.03)
-    alex = Articulation(cfg=alex_robot_cfg)
+        # -- Robot
+        alex_robot_cfg = ALEX_ROBOT_CFG.replace(prim_path=f"/World/Origin{i}/Robot")
+        alex_robot_cfg.init_state.pos = (0, 0, 1.03)
+        alex = Articulation(cfg=alex_robot_cfg)
+
+    alex_robot_cfg_dic = {}
+    alex_dict = {}
+
+    for i in range(0, tmp_num_origins):
+        alex_robot_cfg_dic[f'alex_robot_cfg_{i}'] = ALEX_ROBOT_CFG.replace(prim_path=f"/World/Origin{i}/Robot")
+        alex_robot_cfg_dic[f'alex_robot_cfg_{i}'].init_state.pos = (0, 0, 1.03)
+        alex_dict[f'alex_{i}'] = Articulation(cfg=alex_robot_cfg_dic[f'alex_robot_cfg_{i}'])
 
     # return the scene information
-    scene_entities = {
-        "alex": alex
-    }
-    return scene_entities, origins
+    scene_entities_dic = {}
+    for i in range(0, tmp_num_origins):
+        scene_entities_dic[f"alex_{i}"] = alex_dict[f"alex_{i}"]    
+
+    return scene_entities_dic, origins
 
 def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articulation], origins: torch.Tensor):
 
@@ -248,7 +257,8 @@ def run_simulator(sim: sim_utils.SimulationContext, entities: dict[str, Articula
                 # clear internal buffers
                 robot.reset()
 
-            print("[INFO]: Resetting robots state...")
+            print("[INFO]: Resetting robot state...")
+
         # apply random actions to the robots
         for robot in entities.values():
 
@@ -285,6 +295,7 @@ def main():
     # Set main camera
     sim.set_camera_view([3.5, 0.0, 2.5], [-180 * math.pi/180, 0 * math.pi/180, 0 * math.pi/180])
 
+    num_origins = 10
     # design scene
     scene_entities, scene_origins = design_scene()
     scene_origins = torch.tensor(scene_origins, device=sim.device)
@@ -302,6 +313,6 @@ if __name__ == "__main__":
 
     # run the main function
     main()
-    
+
     # close sim app
     simulation_app.close()
