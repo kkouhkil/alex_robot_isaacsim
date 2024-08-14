@@ -196,19 +196,19 @@ def design_scene(num_of_origins) -> tuple[dict, list[list[float]]]:
     
     for i in range(0, num_of_origins):
         # Origin with Alex
-        prim_utils.create_prim(f"/World/Origin{i}", "Xform", translation=origins[i])
+        prim_utils.create_prim(f"/World/Origin_{i}", "Xform", translation=origins[i])
 
         # -- Stand
         cfg = sim_utils.UsdFileCfg(
             usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/Stand/stand_instanceable.usd", scale=(2.0, 2.0, 2.0)
         )
-        cfg.func(f"/World/Origin{i}/Stand", cfg, translation=(0.0, 0.0, 1.03))
+        cfg.func(f"/World/Origin_{i}/Stand_{i}", cfg, translation=(0.0, 0.0, 1.03))
 
     alex_robot_cfg_dic = {}
     alex_dict = {}
 
     for i in range(0, num_of_origins):
-        alex_robot_cfg_dic[f'alex_robot_cfg_{i}'] = ALEX_ROBOT_CFG.replace(prim_path=f"/World/Origin{i}/Robot")
+        alex_robot_cfg_dic[f'alex_robot_cfg_{i}'] = ALEX_ROBOT_CFG.replace(prim_path=f"/World/Origin_{i}/Robot_{i}")
         alex_robot_cfg_dic[f'alex_robot_cfg_{i}'].init_state.pos = (0, 0, 1.03)
         alex_dict[f'alex_{i}'] = Articulation(cfg=alex_robot_cfg_dic[f'alex_robot_cfg_{i}'])
 
@@ -289,6 +289,7 @@ def main():
     # Set main camera
     sim.set_camera_view([3.5, 0.0, 2.5], [-180 * math.pi/180, 0 * math.pi/180, 0 * math.pi/180])
 
+    # number of loaded robots
     num_of_origins = 16
 
     # design scene
